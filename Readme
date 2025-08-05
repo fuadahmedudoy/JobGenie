@@ -1,1 +1,16 @@
-start
+# JobGenie - AI-Powered Job Recommendation System
+
+## Quick Start
+
+1. **Setup Database**: Create PostgreSQL database named `jobgenie`
+2. **Start Backend**: `cd backend && mvn spring-boot:run` (Port 8080)
+3. **Setup ML Engine**: `cd ml_engine && setup.bat` then `python match_jobs.py` (Port 5000)  
+4. **Start Frontend**: `cd frontend && npm install && npm start` (Port 3000)
+
+## Features
+- Upload CV (PDF) for AI-powered job matching
+- Semantic analysis using sentence transformers
+- Real-time job recommendations with similarity scores
+- User authentication and job browsing
+
+See README.md for detailed setup instructions.

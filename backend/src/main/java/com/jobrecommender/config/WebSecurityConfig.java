@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +27,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -50,11 +54,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/jobs/**").permitAll()
+                .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/jobs/save").authenticated()  // Require auth for saving jobs
+                .antMatchers("/api/jobs/saved").authenticated() // Require auth for getting saved jobs
+                .antMatchers("/api/jobs/saved/**").authenticated() // Require auth for saved job operations
+                .antMatchers("/api/jobs/**").permitAll()  // Allow other job endpoints
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
